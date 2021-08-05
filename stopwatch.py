@@ -18,7 +18,7 @@ def SetupStopwatch(timerLabel):
     else:
         display = str(counter)
     
-    timerLabel.config(text=display)
+    timerLabel.config(text=datetime.datetime.fromtimestamp(counter).strftime('%M:%S'))
 
     
 def Timer(timerLabel):
@@ -56,9 +56,31 @@ def PauseTimer():
     startButton.config(state=NORMAL)
     pauseButton.config(state=DISABLED)
 
+
+def SaveRecord():
+    #insert new record
+    completed = messagebox.askyesno("Record Saved", "You have completed x time on x.\n\nHave you completed this activity?")
+    #if completed:
+        #modify activity completed
+    ResetTimer()
+
+
+def ResetTimer():
+    global counter
+    counter = 0
+    SetupStopwatch(timerLabel)
+
+
 def FinishTimer():
     PauseTimer()
-    response = messagebox.askyesno("Finish Timer", "Are you sure?")
+    finished = messagebox.askyesnocancel("Finish Timer", "Are you sure?")
+    if finished:
+        SaveRecord()
+    else:
+        ResetTimer()
+        
+
+
 
 startButton = Button(root, text="Start", width=15, command=lambda:StartTimer(timerLabel))
 pauseButton = Button(root, text="Pause", width=15, state=DISABLED, command=PauseTimer)
