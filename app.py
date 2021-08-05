@@ -66,7 +66,7 @@ def SaveRecord():
     #insert new record
     completed = messagebox.askyesno("Record Saved", 
         "You have completed " + 
-        datetime.datetime.fromtimestamp(counter).strftime('%-M') + 
+        datetime.datetime.fromtimestamp(counter).strftime('%M') + 
         " minutes of time on " + 
         activityName +
         "\n\nHave you completed this activity?")
@@ -76,8 +76,11 @@ def SaveRecord():
 
 def ResetTimer():
     global counter
+    global activityID
     counter = 0
     SetupStopwatch(timerLabel)
+    activityID = 0
+    app_notebook.select(0)
 
 def FinishTimer():
     PauseTimer()
@@ -89,11 +92,13 @@ def FinishTimer():
 
 
 #Notebook Functions
-def hideTab(index):
-    app_notebook.hide(index)
+def HideTab(index):
+    app_notebook.tab(index, state=HIDDEN)
 
-def selectTab(index):
-    app_notebook.select(index)
+def EnterStopwatch():
+    global activityID
+    activityID = 1
+    app_notebook.select(2)
 
 #Create notebook
 app_notebook = ttk.Notebook(root)
@@ -117,12 +122,14 @@ graph_menu.grid(row=2)
 #Add tabs to notebook
 app_notebook.add(main_menu, text="Main")
 app_notebook.add(timer_menu, text="Timer")
-#app_notebook.add(stopwatch, text="Stopwatch")
+app_notebook.add(stopwatch, text="Stopwatch")
 app_notebook.add(music_menu, text="Music")
 app_notebook.add(graph_menu, text="Graph")
+app_notebook.hide(2)
 
 
 # Main Menu Screen
+
 label1 = Label(main_menu, text="grid test 1")
 label1.grid(row=1, column=1, sticky=NSEW)
 
@@ -143,9 +150,12 @@ main_menu.grid_columnconfigure(3, weight=1)
 
 #Timer Screen
 
+timerButton = Button(timer_menu, text="Start", width=15, command=EnterStopwatch)
+timerButton.grid(row=2)
 
 
 #Stopwatch Screen
+
 timerLabel = Label(stopwatch, text="")
 timerLabel.grid(row=1, columnspan=3)
 
@@ -163,5 +173,16 @@ finishButton.grid(row=2, column=3)
 
 
 #Chart Screen
+
+
+
+#Binds
+#NotebookTabChanged
+
+def OnTabChange(event):
+    if activityID < 1:
+        HideTab(2)
+
+app_notebook.bind('<<NotebookTabChanged>>', OnTabChange)
 
 root.mainloop()
